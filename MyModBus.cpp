@@ -4,11 +4,12 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <unistd.h>
+#include <modbus.h>
 #include "MyModBus.h"
 
 const int      NB_CONNECTION = 5;
 const uint16_t UT_INPUT_REGISTERS_ADDRESS = 0x01;
-const uint16_t UT_INPUT_REGISTERS_NB = 50;
+const uint16_t UT_INPUT_REGISTERS_NB = 100;
 
 MyModBus::MyModBus(const std::string ip, const int port)
 {
@@ -33,11 +34,12 @@ MyModBus::MyModBus(const std::string ip, const int port)
 
     for(int i = 0; i < UT_INPUT_REGISTERS_NB; i++)
     {
-        mb_mapping->tab_input_registers[i] = 0;
+        mb_mapping->tab_input_registers[i] = 1;
     }
 
     modbus_set_slave(ctx, 2);
-    modbus_set_debug(ctx, TRUE);
+//    modbus_set_debug(ctx, TRUE);
+    modbus_set_debug(ctx, FALSE);
     server_socket = modbus_tcp_listen(ctx, NB_CONNECTION);
     if (server_socket == -1) 
     {
@@ -164,5 +166,8 @@ void  MyModBus::ModSelect()
 
 void  MyModBus::SetMapVal(int pos, int val)
 {
-    mb_mapping->tab_input_registers[pos] = val;
+    if(val > 0)
+    mb_mapping->tab_input_registers[pos] = 1;
+    else 
+    mb_mapping->tab_input_registers[pos] = 0;
 }

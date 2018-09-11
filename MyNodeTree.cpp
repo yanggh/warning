@@ -1,8 +1,6 @@
 #include <list>
 #include <strings.h>
 #include <algorithm>
-//#include <utility>
-//#include <algorithm>
 #include "MyNodeTree.h"
 
 static const int  DISCON = 0;
