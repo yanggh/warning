@@ -1,6 +1,7 @@
-g++ MyUdpSocket.cpp MyNodeTree.cpp -c -std=c++11 -Wall  -I /usr/include/mysql/ -L /usr/lib64/mysql/
-g++ MyNodeTree.cpp  MyDataSql.cpp -I /usr/include/mysql/ -L /usr/lib64/mysql/  -c  -std=c++11
+g++ MyUdpSocket.cpp MyNodes.cpp -c -std=c++11 -Wall  -I /usr/include/mysql/ -L /usr/lib64/mysql/
+g++ MyNodes.cpp  MyDataSql.cpp -I /usr/include/mysql/ -L /usr/lib64/mysql/  -c  -std=c++11
 g++ MyNode.cpp  MyNode_test.cpp -std=c++11 -Wall
 g++ MyModBus.cpp MyIscs.cpp -I /usr/include/mysql/ -L /usr/lib64/mysql/  -c -pthread   -lmodbus -I/usr/local/include/modbus  -std=c++11
 g++ MyModBus.cpp  -c -lmodbus -I/usr/local/include/modbus  -std=c++11
 g++ MyConf.cpp MyConf_test.cpp  -std=c++11  -c
+g++ MyModBus.cpp  MyModBus_test.cpp -lmodbus -I/usr/local/include/modbus -L /usr/local/lib/ -std=c++11 -pthread

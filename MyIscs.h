@@ -7,8 +7,8 @@ class MyIscs: public MyDataSql
 {
 public:
     MyIscs(std::string mysqlip, std::string database, std::string username, std::string password, std::string sql1, std::string sql2);
-private:
     void  Iscs_Work();
+private:
     void  DataHandle(MYSQL_ROW row);
 
     int _sub;

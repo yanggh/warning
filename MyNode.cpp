@@ -33,6 +33,20 @@ bool operator==(Node node1, Node node2)
     return (node1._ip == node2._ip);
 }
 
+void  Node::ResetNode(int timeout)
+{
+    this->_timeout = timeout;
+}
+
+void  Node::SubNode()
+{
+    if(this->_timeout > 0)
+        this->_timeout --;
+    else
+        this->_timeout = 0;
+    
+}
+
 Node& Node::operator=(Node node)
 {
     this->_ssys = node._ssys;

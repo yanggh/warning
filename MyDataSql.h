@@ -2,6 +2,7 @@
 #define _MyDataSql_H
 #include <mysql.h>
 #include <string>
+
 class MyDataSql{
 public:
     MyDataSql(std::string mysqlip, std::string username, std::string password, std::string database)

@@ -8,9 +8,8 @@ class MyUdpSocket: public MySocket
 public:
     MyUdpSocket(std::string ip, int port);
     
-    void          RecvUdp();
-    virtual void  Handle() = 0;
-private:
-    MyQueue queue;
+    void  RecvUdp(MyQueue<std::string> *queue);
+//    virtual void  Handle() = 0;
 };
+std::string  GetData(MyQueue<std::string> *queue);
 #endif

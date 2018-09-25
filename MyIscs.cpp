@@ -10,8 +10,6 @@ MyIscs::MyIscs(std::string mysqlip, std::string database, std::string username, 
     _sub = 0;
     _sql1 = sql1;
     _sql2 = sql2;
-    
-    Iscs_Work();
 }
 
 void MyIscs::DataHandle(MYSQL_ROW row)

@@ -15,7 +15,8 @@ public:
     friend bool operator==(Node node1, Node node2);
     friend std::ostream& operator<<(std::ostream &out, Node node);
     Node& operator=(Node node);
-
+    void  ResetNode(int timeout);
+    void  SubNode();
 private:
     uint8_t  _ssys;
     uint8_t  _stop;

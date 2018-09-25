@@ -39,7 +39,7 @@ void MyNodes::ResetNodes(Node node)
     {
         if(*it == node)
         {
-            it->UpdateNode(_timeout); 
+            it->ResetNode(_timeout); 
             break;
         }
     }

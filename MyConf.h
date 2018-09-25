@@ -36,10 +36,6 @@ public:
         return out;
     }
 
-private:
-    static MyConf*  instance;
-
-    MyConf(const string conffile);
 
     int get_keepalive();
     int set_keepalive(const int keepalive);
@@ -100,6 +96,9 @@ private:
     int  set_modbus_min_port(const int modbus_port);
 
 private:
+    static MyConf*  instance;
+    MyConf(const string conffile);
+
     int    _keepalive;
     string  _dir;
     string  _sip;

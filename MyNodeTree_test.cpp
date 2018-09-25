@@ -1,8 +1,8 @@
-#include "MyNodeTree.h"
+#include "MyNodes.h"
 
 int main(int argc, char** argv)
 {
-    MyNodeTree  mynodetree("ip", "database", "username", "password", "sql");
+    MyNodes  mynodetree("ip", "database", "username", "password", "sql");
 
     Node  node(0, 0, "ip", 1234);
 
