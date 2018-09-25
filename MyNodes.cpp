@@ -9,6 +9,34 @@ static const int  SYSSUB = 0;
 static const int  IPSUB = 1;
 static const int  PORTSUB = 2;
 
+MyNodes* MyNodes::getInstance()
+{
+    if(instance == NULL){
+        Lock lock;
+        if(instance == NULL)
+        {
+            std::string  mysqlip = "ip";
+            std::string  database = "data";
+            std::string  username = "username";
+            std::string  password = "password";
+            std::string  sql = "sql";
+
+            instance = new MyNodes(mysqlip, username, password, database, sql);
+        }
+    } 
+    return instance;
+}
+
+MyNodes::~MyNodes()
+{
+    if(instance != NULL)
+        delete instance;
+}
+
+MyNodes::MyNodes(std::string mysqlip, std::string username, std::string password, std::string database, std::string sql):MyDataSql(mysqlip, username, password, database)
+{
+    GetSqlRes(sql);
+}
 
 void MyNodes::DataHandle(MYSQL_ROW row)
 {

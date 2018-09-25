@@ -1,7 +1,8 @@
-g++ MyUdpSocket.cpp MyNodes.cpp -c -std=c++11 -Wall  -I /usr/include/mysql/ -L /usr/lib64/mysql/
-g++ MyNodes.cpp  MyDataSql.cpp -I /usr/include/mysql/ -L /usr/lib64/mysql/  -c  -std=c++11
-g++ MyNode.cpp  MyNode_test.cpp -std=c++11 -Wall
-g++ MyModBus.cpp MyIscs.cpp -I /usr/include/mysql/ -L /usr/lib64/mysql/  -c -pthread   -lmodbus -I/usr/local/include/modbus  -std=c++11
-g++ MyModBus.cpp  -c -lmodbus -I/usr/local/include/modbus  -std=c++11
-g++ MyConf.cpp MyConf_test.cpp  -std=c++11  -c
-g++ MyModBus.cpp  MyModBus_test.cpp -lmodbus -I/usr/local/include/modbus -L /usr/local/lib/ -std=c++11 -pthread
+g++ MyNode_test.cpp MyNode.cpp -std=c++11 -Wall -o MyNode_test
+g++ MyNodes_test.cpp  MyNodes.cpp MyNode.cpp MyDataSql.cpp -lmysqlclient -std=c++11 -Wall  -I /usr/include/mysql/ -L /usr/lib64/mysql/  -o MyNodes_test
+g++ MyZmq_test.cpp MyZmq.cpp MyConf.cpp MyUdpSocket.cpp  MySocket.cpp -std=c++11 -lzmq -pthread -o MyZmq_test
+g++ MyConf_test.cpp  MyConf.cpp  -std=c++11 -o MyConf_test
+g++ MyModBus_test.cpp MyModBus.cpp  -lmodbus  -std=c++11 -pthread -I /usr/local/include/modbus/ -L /usr/local/lib/ -o  MyModBus_test
+g++ MyIscs_test.cpp  MyIscs.cpp MyModBus.cpp MyDataSql.cpp -lmysqlclient  -pthread   -lmodbus -I /usr/include/mysql/ -I/usr/local/include/modbus -L /usr/local/lib/ -L /usr/lib64/mysql/  -std=c++11 -o MyIscs_test
+g++ MyUdpSocket_test.cpp  MyUdpSocket.cpp MySocket.cpp -std=c++11 -o  MyUdpSocket_test
+rm -rf *.o

@@ -20,7 +20,28 @@
 #define  NORTHIP    "north-ip"
 #define  NORTHPORT  "north-port"
 
-MyConf* MyConf::instance = new MyConf(conffile);
+ostream &operator<<(ostream &out, const MyConf *myconf)
+{
+    out <<  "keepalive = " << myconf->_keepalive << endl; 
+    out <<  "dir = " << myconf->_dir << endl;
+    out <<  "sip = " << myconf->_sip << endl;     
+    out <<  "sport = " << myconf->_sport << endl;     
+    out <<  "web_ip = " << myconf->_web_ip << endl;     
+    out <<  "web_port = " << myconf->_web_port << endl;   
+    out <<  "update_ip = " << myconf->_update_ip << endl;
+    out <<  "update_port = " << myconf->_update_port << endl;
+    out <<  "commit = " << myconf->_commit << endl;
+    out <<  "trap_port = " << myconf->_trap_port << endl;  
+    out <<  "username = " << myconf->_username << endl;
+    out <<  "password = " << myconf->_password << endl;
+    out <<  "mysql_ip = " << myconf->_mysql_ip << endl;
+    out <<  "database = " << myconf->_database << endl;
+    out <<  "modbus_major_ip = " << myconf->_modbus_major_ip << endl;
+    out <<  "modbus_major_port = " << myconf->_modbus_major_port << endl;
+    out <<  "modbus_min_ip = " << myconf->_modbus_min_ip << endl;
+    out <<  "modbus_min_port = " << myconf->_modbus_min_port << endl;
+    return out;
+}
 
 int MyConf::get_keepalive()
 {
@@ -37,8 +58,6 @@ int MyConf::comp_keepalive(const int keepalive)
 {
     return (_keepalive == keepalive ? 0 : -1);
 }
-
-
 
 string MyConf::get_sip()
 {
@@ -350,6 +369,4 @@ MyConf::MyConf(const string conffile)
     fclose(fp);
     fp = NULL;
 }
-
-
 

@@ -1,10 +1,10 @@
 #include <zmq.hpp>
-#include <string>
 #include <syslog.h>
 #include <list>
+#include "MyZmq.h"
 #include "MyConf.h"
-#include "MyQueue.h"
 #include "MyUdpSocket.h"
+
 
 using namespace std;
 
@@ -50,7 +50,7 @@ int  UpdateSig()
     return 0;
 }
 
-int ConsumerTask(MyQueue<std::string> myqueue)
+int ConsumerTask(MyQueue<std::string>& myqueue)
 {
     MyConf* myconf = MyConf::getInstance();
 
@@ -68,7 +68,7 @@ int ConsumerTask(MyQueue<std::string> myqueue)
     std::string data;
     while(1)
     {
-        data = GetData(&myqueue);
+        data = GetData(myqueue);
         
         zmq::message_t req(strlen(data.c_str()));
         memset((void*)req.data(), 0, strlen(data.c_str()));

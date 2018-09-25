@@ -40,7 +40,6 @@ int main(int argc, char** argv)
     std::thread th1(pth1);
     std::thread th2(pth2);
 
-
     th1.join();
     th2.join(); 
     return 0;

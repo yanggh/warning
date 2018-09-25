@@ -11,7 +11,7 @@ public:
         mysql_real_connect(&mysql, mysqlip.c_str(), username.c_str(), password.c_str(), database.c_str(), 0, NULL, 0);
     } 
 
-    ~MyDataSql()
+    virtual ~MyDataSql()
     {
         mysql_free_result(my_res);
         mysql_close(&mysql);

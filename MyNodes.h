@@ -28,23 +28,8 @@ public:
 class MyNodes: public MyDataSql
 {
 public:
-    static MyNodes* getInstance()
-    {
-        if(instance == NULL){
-            Lock lock;
-            if(instance == NULL)
-            {
-                std::string  mysqlip = "ip";
-                std::string  database = "data";
-                std::string  username = "username";
-                std::string  password = "password";
-                std::string  sql = "sql";
-
-                instance = new MyNodes(mysqlip, username, password, database, sql);
-            }
-        }  
-        return instance;
-    }
+    static MyNodes* getInstance();
+    ~MyNodes();
 
     void   DataHandle(MYSQL_ROW row);
     void   ResetNodes(Node node);
@@ -52,15 +37,11 @@ public:
 
 private:
     static MyNodes* instance;
-    MyNodes(std::string mysqlip, std::string username, std::string password, std::string database, std::string sql):MyDataSql(mysqlip, username, password, database)
-    {
-        GetSqlRes(sql);
-    }
+    MyNodes(string mysqlip, string username, string password, string database, string sql);
 
     std::vector<Node>   vssys;
     int                 _timeout;
 };
 
-MyNodes *MyNodes::instance = NULL;
 
 #endif

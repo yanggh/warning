@@ -1,5 +1,7 @@
 #include "MyConf.h"
 
+const  string conffile{"/usr/local/warning/etc/database.conf"};
+MyConf* MyConf::instance = new MyConf(conffile);
 
 int main()
 {
