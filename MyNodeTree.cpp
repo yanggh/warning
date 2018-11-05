@@ -9,7 +9,6 @@ static const int  SYSSUB = 0;
 static const int  IPSUB = 1;
 static const int  PORTSUB = 2;
 
-
 void MyNodes::DataHandle(MYSQL_ROW row)
 {
     uint8_t stop = 1;

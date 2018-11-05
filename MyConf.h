@@ -4,14 +4,18 @@
 #include <iostream>
 using namespace std;
 
-
 class MyConf{
 public:
-   static MyConf* getInstance()
+    static MyConf* getInstance()
     {
+        if(instance == NULL)
+        {
+            instance = new MyConf("/usr/local/warning/etc/database.conf");
+        }
         return instance;        
     }
 
+    ~MyConf();
     friend ostream &operator<<(ostream &out, const MyConf *myconf);
 
     int get_keepalive();

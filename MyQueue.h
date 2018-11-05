@@ -67,6 +67,12 @@ public:
         return res;
     }
 
+    size_t  size()
+    {
+        std::lock_guard<std::mutex> lk(mtx);
+        return qdata.size();
+    }
+
     bool empty() const
     {
         std::lock_guard<std::mutex> lk(mtx);

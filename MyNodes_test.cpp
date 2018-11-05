@@ -1,11 +1,11 @@
+#include <string>
 #include "MyNodes.h"
 
-MyNodes *MyNodes::instance = NULL;
 int main(int argc, char** argv)
 {
     MyNodes* mynodes = MyNodes::getInstance();
 
-    mynodes->UpdateNodes();
+    std::cout << mynodes << std::endl;
     return 0;
 
 

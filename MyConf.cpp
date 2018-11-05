@@ -20,6 +20,7 @@
 #define  NORTHIP    "north-ip"
 #define  NORTHPORT  "north-port"
 
+MyConf* MyConf::instance{NULL};
 ostream &operator<<(ostream &out, const MyConf *myconf)
 {
     out <<  "keepalive = " << myconf->_keepalive << endl; 
@@ -43,6 +44,11 @@ ostream &operator<<(ostream &out, const MyConf *myconf)
     return out;
 }
 
+MyConf::~MyConf()
+{
+    if(instance != NULL)
+        delete instance;
+}
 int MyConf::get_keepalive()
 {
     return _keepalive;

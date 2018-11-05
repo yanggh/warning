@@ -13,7 +13,7 @@ public:
 private:
     uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
     int     server_socket;
-    modbus_mapping_t *mb_mapping{nullptr};
-    modbus_t *ctx{nullptr};
+    modbus_mapping_t *mb_mapping{NULL};
+    modbus_t *ctx{NULL};
 };
 #endif

@@ -6,11 +6,6 @@
 
 static MyModBus mybus("192.168.43.217", 1502);
 
-void pth1()
-{
-    mybus.ModSelect();
-}
-
 void pth2()
 {
     int pos = 0;
@@ -37,7 +32,7 @@ void pth2()
 
 int main(int argc, char** argv)
 {
-    std::thread th1(pth1);
+    std::thread th1(&MyModBus::ModSelect, mybus);
     std::thread th2(pth2);
 
     th1.join();

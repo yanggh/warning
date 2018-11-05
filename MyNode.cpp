@@ -1,7 +1,7 @@
 #include <string.h>
 #include "MyNode.h"
 
-Node::Node(uint8_t ssys, uint8_t stop, std::string ip, int port, int flag, int timeout)
+Node::Node(const uint8_t& ssys, const uint8_t& stop, const std::string& ip, const uint16_t& port, const bool& flag, const int& timeout)
 {
     _ssys = ssys;
     _stop = stop;
@@ -28,7 +28,7 @@ std::ostream &operator<<(std::ostream &out, Node node)
     return out;
 }
 
-bool operator==(Node node1, Node node2)
+bool operator == (Node node1, Node node2)
 {
     return (node1._ip == node2._ip);
 }
@@ -36,15 +36,6 @@ bool operator==(Node node1, Node node2)
 void  Node::ResetNode(int timeout)
 {
     this->_timeout = timeout;
-}
-
-void  Node::SubNode()
-{
-    if(this->_timeout > 0)
-        this->_timeout --;
-    else
-        this->_timeout = 0;
-    
 }
 
 Node& Node::operator=(Node node)

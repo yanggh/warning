@@ -161,7 +161,6 @@ void  MyModBus::ModSelect()
             }
         }
     }
-
 }
 
 void  MyModBus::SetMapVal(int pos, int val)
