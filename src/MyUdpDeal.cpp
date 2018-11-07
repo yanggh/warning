@@ -5,12 +5,13 @@
 #include "MySocket.h"
 #include "MyNodes.h"
 #include "MyQueue.h"
-
+#include "MyRecvSnmp.h"
+#include "MyUdpDeal.h"
 const char* WAR_JSON_STR = "{ type: \"%d\", fnum: \"%d\", flen: \"%d\", son_sys: \"%d\", stop: \"%d\", eng: \"%d\", node:\"%d\", bug: \"%d\", time: \"%02d%02d-%02d-%02d %02d:%02d:%02d\", res1: \"%d\", res2: \"%d\", res3: \"%d\", check: \"%d\"}";
 
 using namespace std;
 
-MyQueue<std::string> myqueue;
+extern  MyQueue<std::string> myqueue;
 
 void RecvData(MySocket& socket)
 {
@@ -238,13 +239,3 @@ bool DealData(MySocket& socket)
     return true;
 }
 
-int main(int argc, char** argv)
-{
-    MySocket  socket1(argv[1], 9999);
-
-    std::thread  th1(RecvData, std::ref(socket1));
-    std::thread  th3(DealData, std::ref(socket1));
-
-    th1.join();
-    th3.join();
-}
