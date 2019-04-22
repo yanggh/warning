@@ -28,13 +28,14 @@ void MyDataSql::GetSqlRes(const std::string sql)
     if(ret == 0)
     {
        my_res = mysql_store_result(mysql);//返回查询的全部结果集
-       while((row = mysql_fetch_row(my_res)) > 0)
+       while(NULL != (row = mysql_fetch_row(my_res)))
        {
            DataHandle(row);
        }
     }
     else
     {
+        syslog(LOG_INFO, "ip is %s, username is %s,  password is %s, error: %s", mysqlip.c_str(), username.c_str(), password.c_str(), mysql_error(mysql));
         syslog(LOG_ERR, "mysql_real_query error, sql is %s", sql.c_str());
         exit(-1);
     }

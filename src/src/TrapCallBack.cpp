@@ -24,9 +24,9 @@ void   TrapCallBack(int reason, Snmp_pp::Snmp *snmp, Snmp_pp::Pdu &pdu, Snmp_pp:
     char  heartip[1024];
     bzero(heartip, 1024);
     sscanf(addr.get_printable(), "%[^/]s%*s", heartip);
-    printf("heartip = %s\n" ,addr.get_printable());//(char*)addr);
+    syslog(LOG_INFO, "heartip = %s\n" , heartip);
     //获取子系统连接状态
-    mynodes->HeartBeat("127.0.0.1", 162);
+    mynodes->HeartBeat(heartip, 162);
 
     int pdu_error;
     pdu_error = pdu.get_error_status();
@@ -53,8 +53,7 @@ void   TrapCallBack(int reason, Snmp_pp::Snmp *snmp, Snmp_pp::Pdu &pdu, Snmp_pp:
     {
 
     }       
-
-        
+ 
     char output[1024];
     memset(output, 0, 1024);
     snprintf(output, 1024, SNMP_JSON_STR.c_str(), son_sys, bus, jk.c_str(), cw.c_str(), code, atime.c_str());

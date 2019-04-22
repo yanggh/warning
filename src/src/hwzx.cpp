@@ -1,13 +1,11 @@
 #include <string>
-#include <fstream>
 #include <map>
 #include <syslog.h>
 #include "Snmp.h"
-
+#include "Conf.h"
 #include "snmp_pp/snmp_pp.h"
 #include "snmp_pp/collect.h"
 #include "snmp_pp/notifyqueue.h"
-
 
 using namespace std;
 using namespace Snmp_pp;
@@ -15,9 +13,6 @@ using namespace Snmp_pp;
 static  const string  zte_gw_ip   =  "10.71.20.129";
 static  const string  zte_g_cs_ip =  "10.71.14.11";
 static  const string  zte_7_cs_ip =  "10.71.14.12";
-
-const string IPBUS = "/usr/local/warning/etc/ip_addr";
-const string ZXCODE = "/usr/local/warning/etc/zxcode";
 
 map<string, int> codemap = {
     {"21212", 12},
@@ -28,45 +23,6 @@ map<string, int> ipmap = {
     {"21212", 12},
     {"21213", 12}
 }; 
-
-int map_zx_code(map<long,  int>& codemap)
-{
-    int   id = 0;
-    long  code = 0;
-    char  buff[256];
-
-    ifstream infile(ZXCODE, ios::in);
-    
-    while(infile.good())
-    {
-        infile.getline(buff,256);
-        sscanf(buff, "%ld, %d", &code, &id);
-        codemap.insert(pair<long, int>(code, id));
-    }
-
-    infile.close();
-    return 0;
-}
-
-int  map_ip_bus(map<string, int>& ipmap) 
-{
-    int   id = 0;
-    char  ip[256];
-    char  buff[256];
-
-    ifstream infile(IPBUS, ios::in);
-    while(infile.good())
-    {
-        infile.getline(buff,256);
-        bzero(ip, 256);
-        sscanf(buff, "%s, %d", ip, &id);
-        ipmap.insert(pair<string, int>(ip, id));
-    }
-
-    infile.close();
-    return 0;
-}
-
 
 bool  zxGetData(Pdu& pdu, int& son_sys, int& bus, string& jk, string& cw, int& code, string& atime)
 {
@@ -83,6 +39,7 @@ bool  zxGetData(Pdu& pdu, int& son_sys, int& bus, string& jk, string& cw, int& c
         nextVb.get_value(value);
         nextVb.get_oid(oid);
            
+        syslog(LOG_INFO, "i = %d, oid = %s, value = %s\n", i, oid.get_printable(), value);
         /*************中兴设备********************/
         if(oid  == Oid(zxEventNotify["zxEvType"].c_str()))
         {
@@ -221,8 +178,7 @@ bool  hwGetData(Pdu& pdu, int& son_sys, int& bus, string& jk, string& cw, int& c
         memset(value, 0, 1024);
         nextVb.get_value(value);
         nextVb.get_oid(oid);
-        cout << "i = " << i << ", oid = " << oid.get_printable() << ", value = " << value << endl;
-
+        syslog(LOG_INFO, "i = %d, oid = %s, value = %s\n", i, oid.get_printable(), value);
         /*************华为设备********************/
         //槽位信息
         if(oid  == Oid(hwEventNotify["hwNePos"].c_str()))

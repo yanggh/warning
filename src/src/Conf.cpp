@@ -1,28 +1,33 @@
 #include <iostream>
 #include <thread>
+#include <fstream>
 #include <unistd.h>
 #include <string.h>
 #include <syslog.h>
+#include <map>
 #include "Common.h"
 #include "Conf.h"
 
-#define  KEEPALIVE  "keepalive"
-#define  LOGDIR     "log-dir"
-#define  INNERIP    "inner-ip"
-#define  UPDATEPORT "update-port"
-#define  WEBPORT    "web-port"
-#define  USERNAME   "username"
-#define  PASSWORD   "password"
-#define  DATABASE   "database"
-#define  SOUTHIPM    "south-major-ip"
-#define  SOUTHPORTM  "south-major-port"
-#define  SOUTHIP    "south-min-ip"
-#define  SOUTHPORT  "south-min-port"
-#define  NORTHIP    "north-ip"
-#define  NORTHPORT  "north-port"
-#define  SOUNDIP    "sound-ip"
-#define  SOUNDPORT  "sound-port"
-#define  PUBPORT    "pub-port"
+const char* KEEPALIVE  = "keepalive";
+const char* LOGDIR     = "log-dir";
+const char* INNERIP    = "inner-ip";
+const char* UPDATEPORT = "update-port";
+const char* WEBPORT    = "web-port";
+const char* USERNAME   = "username";
+const char* PASSWORD   = "password";
+const char* DATABASE   = "database";
+const char* SOUTHIPM   = "south-major-ip";
+const char* SOUTHPORTM = "south-major-port";
+const char* SOUTHIP    = "south-min-ip";
+const char* SOUTHPORT  = "south-min-port";
+const char* NORTHIP    = "north-ip";
+const char* NORTHPORT  = "north-port";
+const char* SOUNDIP    = "sound-ip";
+const char* SOUNDPORT  = "sound-port";
+const char* PUBPORT    = "pub-port";
+
+const string IPBUS = "/usr/local/warning/etc/ip_addr";
+const string ZXCODE = "/usr/local/warning/etc/zxcode";
 
 MyConf* MyConf::getInstance()
 {
@@ -55,6 +60,13 @@ ostream &operator<<(ostream &out, const MyConf *myconf)
     out <<  "sound_ip = " << myconf->_sound_ip << endl;
     out <<  "sound_port = " << myconf->_sound_port << endl;
     out <<  "pub_port = " << myconf->_pub_port << endl;
+
+    for(auto& val : myconf->codemap)
+        out << val.first << ", " << val.second << endl;
+
+    for(auto& val : myconf->ipmap)
+        out << val.first << ", " << val.second << endl; 
+
     return out;
 }
 
@@ -336,8 +348,83 @@ int  MyConf::set_modbus_min_port(const int modbus_port)
     return 0;
 }
 
+map<string, int>  MyConf::get_zx_code()
+{
+    return move(codemap);
+}
+
+map<string, int>  MyConf::get_ip_bus()
+{
+    return move(ipmap);
+}
+
+int MyConf::set_zx_code()
+{
+    int   id = 0;
+    char  code[256];
+    char  buff[256];
+    
+    std::pair<map<string, int>::iterator, bool> ret;
+    ifstream infile(ZXCODE, ios::in);
+    
+    while(infile)
+    {
+        infile.getline(buff,256);
+        bzero(code, 256);
+        if(-1 != sscanf(buff, "%s  %d", code, &id))
+        {
+            ret = codemap.insert(pair<string, int>(code, id));
+            if(ret.second == false)
+            {
+                syslog(LOG_INFO, "codemap insert error %s, %d\n", code, id);
+            }
+        }
+        else
+        {
+            syslog(LOG_INFO, "codemap sscanf error %s, %d\n", code, id);
+        }
+    }
+
+    infile.close();
+    return 0;
+}
+
+int  MyConf::set_ip_bus() 
+{
+    int   id = 0;
+    char  ip[256];
+    char  buff[256];
+
+    std::pair<map<string, int>::iterator, bool> ret;
+    ifstream infile(IPBUS, ios::in);
+    while(infile)
+    {
+        infile.getline(buff,256);
+        bzero(ip, 256);
+        if(-1 != sscanf(buff, "%s %d", ip, &id))
+        {
+            ret = ipmap.insert(pair<string, int>(ip, id));
+            if(ret.second == false)
+            {
+                syslog(LOG_INFO, "ipmap insert error %s\n", buff);
+            }
+        }
+        else
+        {
+            syslog(LOG_INFO, "codemap sscanf error %s\n", buff);
+        }
+    }
+
+    infile.close();
+    return 0;
+} 
+
+/************************************/
 MyConf::MyConf(const string& conffile)
 {
+    set_zx_code();
+    set_ip_bus();
+
     char  buf1[256];
     char  buf2[256];
     char  buff[256];

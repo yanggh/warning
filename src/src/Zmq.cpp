@@ -21,7 +21,7 @@ int ConsumerTask()
 
     char   constr[256] = {0};
     snprintf(constr, 256, "tcp://%s:%d", ip.data(), port);
-    cout << "constr = " << constr << endl;
+    syslog(LOG_INFO, "constr = %s", constr);
     socket.connect (constr);
     
     std::string    data;
@@ -32,7 +32,7 @@ int ConsumerTask()
     {
         myqueue.wait_and_pop(data);
         req.rebuild(data.data(), data.size());
-        cout << "req data:" << data << endl;
+        syslog(LOG_INFO, "req data: %s", data.c_str());
 
         if(socket.send(req) < 0)
         {
@@ -46,7 +46,5 @@ int ConsumerTask()
     }
     
     socket.close();
-    
-    cout << "ConsumerTask" << endl;
     return 0;
 }

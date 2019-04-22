@@ -8,7 +8,6 @@
 #include "RecvSnmp.h"
 #include "UdpDeal.h"
 
-//const char* WAR_JSON_STR = "{ type: \"%d\", fnum: \"%d\", flen: \"%d\", son_sys: \"%d\", stop: \"%d\", eng: \"%d\", node:\"%d\", bug: \"%d\", time: \"%02d%02d-%02d-%02d %02d:%02d:%02d\", res1: \"%d\", res2: \"%d\", res3: \"%d\", check: \"%d\"}";
 const char* WAR_JSON_STR = "{ \"type\": \"%d\", \"fnum\": \"%d\", \"flen\": \"%d\", \"son_sys\": \"%d\", \"stop\": \"%d\", \"eng\": \"%d\", \"node\":\"%d\", \"bug\": \"%d\", \"time\": \"%02d%02d-%02d-%02d %02d:%02d:%02d\", \"res1\": \"%d\", \"res2\": \"%d\", \"res3\": \"%d\", \"check\": \"%d\"}";
 
 using namespace std;
@@ -27,11 +26,7 @@ void RecvData(MySocket& socket)
     int   sockfd = socket.get_sockfd();
     int   len = 0;
 
-#ifdef __TEST__
-    for(int i = 0; i < 150000; i++)
-#else
     while(1)
-#endif
     {
         memset(message, 0, nRecvBuf);
         len = recvfrom(sockfd, message, nRecvBuf, 0, (struct sockaddr*)&sin, (socklen_t*)&sin_len);
@@ -106,7 +101,7 @@ std::string  WDeComp(const std::string data, std::string& result)
 
     char  output[1024];
     memset(output, 0, 1024);
-    if(snprintf(output, 1024, WAR_JSON_STR, ntohs(type), ntohs(fnum), flen, son_sys, stop, eng,  node,  ntohs(bug),  tt[0],  tt[1], tt[2], tt[3], tt[4], tt[5], tt[6], ntohs(res1), ntohs(res2), ntohs(res3), ntohs(check)) > 0)
+    if(snprintf(output, 1024, WAR_JSON_STR, 0xFF7E, ntohs(fnum), flen, son_sys, stop, eng,  node,  ntohs(bug),  tt[0],  tt[1], tt[2], tt[3], tt[4], tt[5], tt[6], ntohs(res1), ntohs(res2), ntohs(res3), ntohs(check)) > 0)
     {
         result = output;
     }
@@ -193,13 +188,9 @@ bool Timeout(MySocket& socket)
     int    sockfd = socket.get_sockfd();
    
 
-#ifdef __TEST__
-    for(int i = 0; i < 20; i++)
-#else
     while(1)
-#endif
     {
-        sleep(2);
+        sleep(1);
         mynodes->UpdateNodes(sockfd);
     }
 }
@@ -218,19 +209,15 @@ bool DealData(MySocket& socket)
 
     MyNodes* mynodes = MyNodes::getInstance();
 
-    int i = 0;
-#ifdef __TEST__
-    for(i = 0; i < 180000; i++)
-#else    
     while(1)
-#endif
     {
         result = "invalid";
         if(socket.get_data(sin, data))
         {
-            if(((data[0] & 0xff) == 0xFF) && ((data[1] & 0xFF) == 0x7E))
+            if((((data[0] & 0xff) == 0xFF) && ((data[1] & 0xFF) == 0x7E))
+               || (((data[0] & 0xff) == 0x7E) && ((data[1] & 0xFF) == 0xFF)))
             {
-                std::cout << "告警数据/告警恢复:" << std::endl;
+                syslog(LOG_INFO, "告警数据/告警恢复");
                 sdata.assign(data, 0, 4);
                 sendto(sockfd, sdata.data(), sdata.size(), 0, (struct sockaddr *)&sin, sizeof(sin));
 
@@ -238,35 +225,30 @@ bool DealData(MySocket& socket)
             }
             else if((data[0] & 0xff) == 0xFF && (data[1] & 0xFF) == 0x4E)
             {
-                std::cout << "采集数据:" << std::endl;         
+                syslog(LOG_INFO, "采集数据");
                 sdata.assign(data, 0, 4);
                 sendto(sockfd, sdata.data(), sdata.size(), 0, (struct sockaddr *)&sin, sizeof(sin));
 
                 DDeComp(data, result);
             }
-
+            else if((data[0] & 0xff) == 0xFF || (data[0] & 0xff) == 0x0A)
+            {
+                ip = inet_ntoa(sin.sin_addr);
+                port = ntohs(sin.sin_port);
+                mynodes->HeartBeat(ip, port);
+            }
             //TODO
             if(result != "invalid")
             {
                 ip = inet_ntoa(sin.sin_addr);
                 port = ntohs(sin.sin_port);
                 myqueue.push_data(result);
-                cout << "ip = " << ip << ", port = " << port << ", myqueue.size() = " << myqueue.size() << endl;
-                cout << "result = " << result << flush <<endl;
-            }
-            else
-            {
-                i--;
-            }
-            //心跳数据
-            {
-                mynodes->HeartBeat(ip, port);
+                syslog(LOG_INFO, "ip = %s, port = %d, mysqueue.size() = %ld", ip.c_str(), port, myqueue.size());
             }
         }
         else
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            i > 0 ? i-- : i = 0;
+        //    std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
     return true;
@@ -287,6 +269,6 @@ int  UdpDeal()
     th2.join();
     th3.join();
 
-    cout << "UdpDeal endl" << endl;    
+    syslog(LOG_INFO, "UdpDeal endl"); 
     return 0;
 }

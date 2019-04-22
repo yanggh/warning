@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <thread>
+#include <syslog.h>
 #include "Socket.h"
 
 static const int nRecvBuf = 1024;       //设置成5M
@@ -13,8 +14,8 @@ MySocket::MySocket(std::string ip, int port):_ip{ip}, _port{port}
 
     if(((_sockfd = socket(AF_INET, SOCK_DGRAM, 0))< 0))
     {
-            std::cout << "create  socket error" << std::endl;
-            exit(-1);
+        syslog(LOG_ERR, "create  socket error");
+        exit(-1);
     }
 
     memset(&sin, 0, sizeof(sin));
@@ -25,7 +26,7 @@ MySocket::MySocket(std::string ip, int port):_ip{ip}, _port{port}
 
     if(bind(_sockfd, (struct sockaddr *)&sin, sizeof(struct sockaddr_in)) < 0)
     {
-        std::cout << "bind udp service error, ip = " << _ip << ", port = " << _port << ", error = " << strerror(errno) << std::endl;
+        syslog(LOG_ERR, "bind udp service error, ip = %s, port = %d, error = %s\n", _ip.c_str(), _port,  strerror(errno));
         exit(-1);
     }
 

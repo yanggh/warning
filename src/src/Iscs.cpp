@@ -6,6 +6,7 @@ const uint16_t UT_INPUT_REGISTERS_ADDRESS = 0x01;
 const uint16_t UT_INPUT_REGISTERS_NB = 100;
 
 static  const std::string  iscs_1 = "SELECT subsys_.SUBSYSTEM_CODE, IFNULL(sub_.QTY,0) qty FROM TBL_RESMANAGE_SUBSYSTEMINFO subsys_ LEFT JOIN (SELECT b.SUBSYSTEM_CODE,COUNT(*) QTY FROM TBL_ALARM_ALARMINFO a LEFT JOIN TBL_RESMANAGE_SUBSYSTEMINFO b ON a.SUBSYSTEMID=b.SUBSYSTEMID WHERE a.ALARM_STATE=0 AND a.FAULTID!=\"\" AND a.FAULTUNITID!=\"\" AND a.SUBSYSTEMID!=\"\" AND a.STATIONID!=\"\"  GROUP BY a.SUBSYSTEMID  LIMIT  8) sub_ ON subsys_.SUBSYSTEM_CODE=sub_.SUBSYSTEM_CODE LIMIT 9;";
+
 static const  std::string  iscs_2  =  "SELECT        station.STATION_NAME,   IFNULL(q.QTY,0) qty  FROM TBL_RESMANAGE_STATIONINFO station LEFT JOIN(SELECT IFNULL(count(*),0) QTY,alarm.STATIONID FROM TBL_ALARM_ALARMINFO  alarm, TBL_RESMANAGE_FAULTINFO  fault ,TBL_RESMANAGE_SUBSYSTEMINFO system  WHERE alarm.FAULTID=fault.FAULTID AND fault.FAULT_CODE=4226 AND alarm.SUBSYSTEMID=system.SUBSYSTEMID AND system.SUBSYSTEM_CODE=8 AND alarm.ALARM_STATE!=2 GROUP BY  STATIONID) q ON station.STATIONID=q.STATIONID WHERE STATION_ORDER_NO <> 97 AND STATION_ORDER_NO <> 98 AND STATION_ORDER_NO <> 99 ORDER BY station.STATION_ORDER_NO asc  LIMIT 34";
     
 static  MyIscs myiscs(iscs_1, iscs_2);
@@ -15,7 +16,7 @@ MyModBus::MyModBus(const std::string ip, const int port, const int slave)
     ctx = modbus_new_tcp((const char*)(ip.c_str()), port);
     if(ctx == NULL)
     {
-        printf("%s-%d:modbus_new_tcp(%s:%d) fail", __FILE__, __LINE__, ip.c_str(), port);
+        syslog(LOG_INFO, "%s-%d:modbus_new_tcp(%s:%d) fail", __FILE__, __LINE__, ip.c_str(), port);
         modbus_free(ctx);
         ctx = NULL;
         exit(-1);
@@ -28,7 +29,7 @@ MyModBus::MyModBus(const std::string ip, const int port, const int slave)
             UT_INPUT_REGISTERS_ADDRESS, UT_INPUT_REGISTERS_NB);
     if (mb_mapping == NULL) 
     {
-        printf("%s-%d: modbus_mapping_new_start_address fail", __FILE__, __LINE__);
+        syslog(LOG_INFO, "%s-%d: modbus_mapping_new_start_address fail", __FILE__, __LINE__);
         exit(-1);
     }
 
@@ -42,7 +43,7 @@ MyModBus::MyModBus(const std::string ip, const int port, const int slave)
     server_socket = modbus_tcp_listen(ctx, NB_CONNECTION);
     if (server_socket == -1) 
     {
-        printf("%s-%d: modbus_tcp_listen fail", __FILE__, __LINE__);
+        syslog(LOG_ERR, "%s-%d: modbus_tcp_listen fail", __FILE__, __LINE__);
         modbus_free(ctx);
         ctx = NULL;
         exit(-1);
@@ -115,7 +116,6 @@ void  MyModBus::ModSelect()
                 if (newfd == -1) 
                 {
                     syslog(LOG_ERR, "Server accept() error");
-                    printf("Server accept() error");
                 }
                 else 
                 {

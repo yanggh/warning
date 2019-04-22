@@ -13,9 +13,9 @@ static const int   PORTSUB = 2;
 
 extern MyQueue<std::string> myqueue;
 
-const string  MYSQL_SYS_STR = "SELECT SUBSYSTEM_CODE,SERVER_IP,SERVER_PORT FROM TBL_RESMANAGE_SUBSYSTEMINFO WHERE SUBSYSTEM_CODE != 1 AND SUBSYSTEM_CODE != 2 AND SUBSYSTEM_CODE < 10;";
+//const string  MYSQL_SYS_STR = "SELECT SUBSYSTEM_CODE,SERVER_IP,SERVER_PORT FROM TBL_RESMANAGE_SUBSYSTEMINFO WHERE SUBSYSTEM_CODE != 1 AND SUBSYSTEM_CODE != 2 AND SUBSYSTEM_CODE < 10;";
+const string  MYSQL_SYS_STR = "SELECT SUBSYSTEM_CODE,SERVER_IP,SERVER_PORT FROM TBL_RESMANAGE_SUBSYSTEMINFO WHERE SUBSYSTEM_CODE != 13 AND SUBSYSTEM_CODE != 11 ";
 
-//const char* KEEP_ALIVE_STR = "{ type: \"0xFFFF\", fnum: \"0\", flen: \"0\", son_sys: \"%d\", stop: \"%d\", eng: \"0\", node:\"0\", bug: \"0\", time: \"0\", res1: \"%s\", res2: \"%d\", res3: \"%d\", check: \"0\"}";
 const char* KEEP_ALIVE_STR = "{ \"type\": \"0xFFFF\", \"fnum\": \"0\", \"flen\": \"0\", \"son_sys\": \"%d\", \"stop\": \"%d\", \"eng\": \"0\", \"node\":\"0\", \"bug\": \"0\", \"time\": \"0\", \"res1\": \"%s\", \"res2\": \"%d\", \"res3\": \"%d\", \"check\": \"0\"}";
 
 MyNodes* MyNodes::getInstance()
@@ -55,7 +55,7 @@ void MyNodes::DataHandle(MYSQL_ROW row)
     uint16_t   port = atoi(row[PORTSUB]);
 
     int     timeout = _timeout;
-    bool    flag = CONNECT;
+    bool    flag = DISCON;
 
     Node p(ssys, stop, ip, port, flag, timeout);
 
@@ -66,8 +66,9 @@ void  MyNodes::HeartBeat(const string& ip, const uint16_t& port)
 {
     for(auto& val : nms)
     {
-        if(val._ip == ip && val._port == port)
+        if(val._ip == ip)
         {
+            syslog(LOG_INFO, "UPDATE Heartbeat : %s, %d, %d, %d, %s, %d, %d", ip.c_str(), port, val._ssys, val._stop, val._ip.c_str(), val._port, val._flag);
             val._timeout = _timeout;
 
             if(val._flag == DISCON)
@@ -79,6 +80,7 @@ void  MyNodes::HeartBeat(const string& ip, const uint16_t& port)
                 if(snprintf(output, 256, KEEP_ALIVE_STR,  val._ssys, val._stop, val._ip.c_str(), val._port, val._flag) > 0)
                 {
                     //TODO ENQUEUE
+                    syslog(LOG_INFO, "CONNECT FFFF is %s", output);
                     myqueue.push_data(output);
                 }
             }
@@ -109,6 +111,8 @@ void MyNodes::UpdateNodes(int sockfd)
     //遍历子系统时间
     for(auto& val : nms)
     {
+        syslog(LOG_INFO, "UPDATE: %d, %d, %s, %d, %d", val._ssys, val._stop, val._ip.c_str(), val._port, val._flag);
+
         if(val._timeout > 0)
         {
             val._timeout --;
@@ -125,13 +129,17 @@ void MyNodes::UpdateNodes(int sockfd)
                 if(snprintf(output, 256, KEEP_ALIVE_STR,  val._ssys, val._stop, val._ip.c_str(), val._port, val._flag) > 0)
                 {
                     //TODO ENQUEUE         
+                    syslog(LOG_INFO, "DISCON FFFF is %s", output);
                     myqueue.push_data(output);
                 }
             }
         }
          
         alive[2] = val._ssys;
-        sendto(sockfd, alive, 10, 0, (struct sockaddr*)&(val._sin), sizeof(val._sin));
+        if(val._port != 162)
+        {
+            sendto(sockfd, alive, 10, 0, (struct sockaddr*)&(val._sin), sizeof(val._sin));
+        }
     }
 }
 

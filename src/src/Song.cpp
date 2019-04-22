@@ -216,7 +216,7 @@ void DealPubData()
     while(1)
     {      
         slqueue.wait_and_pop(value);
-        printf("rgb-flag %02x:%02x\n", value.first, value.second);
+        syslog(LOG_INFO, "rgb-flag %02x:%02x\n", value.first, value.second);
         Sig_light(value.first, value.second);
     }
 }
@@ -228,6 +228,7 @@ void  RecvPubData()
     string ip = myconf->get_web_ip();
     int    port = myconf->get_pub_port();
     snprintf(constr, 256, "tcp://%s:%d", ip.c_str(), port);
+    syslog(LOG_INFO, "%s", constr);
 
     zmq::context_t context (1);
     zmq::socket_t socket (context, ZMQ_SUB);
@@ -242,7 +243,6 @@ void  RecvPubData()
     {        
         socket.recv (&request);
         recvdata.assign(static_cast<char*>(request.data()), request.size());
-        std::cout << recvdata << std::endl;
         Deal(recvdata);
     }
 }
